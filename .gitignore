@@ -1,0 +1,4 @@
+node_modules/
+.edge-tmp/
+*.log
+.DS_Store

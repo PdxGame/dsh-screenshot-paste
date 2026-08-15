@@ -1,0 +1,7 @@
+# dsh-screenshot-paste bundle patch: inserts the dual-face plugin row into
+# the web profile roster. The node half (exports ".") runs in the host
+# process (save/list/file/delete routes), and the dsh.client declaration in
+# package.json makes the browser half (exports "./client") load in the web GUI.
+- insert:
+    - id: screenshot-paste
+      name: dsh-screenshot-paste
