@@ -88,11 +88,11 @@ F:\dsh-screenshots\报告-150601.docx
 
 本插件**不包含**任何视觉模型或识图能力，仅负责文件落地与路径附带。若需要智能体识别图片内容（描述图片、提取图中文字等），必须另行配置。
 
-**推荐：安装 `qwen-vision` skill**（Qwen VL 视觉模型，走阿里云百炼 DashScope 的 OpenAI 兼容接口）：
+**推荐：安装 `claude-vision-skill`**（[asuojun/claude-vision-skill](https://github.com/asuojun/claude-vision-skill)）——让无视觉能力的模型获得识图能力，把图片交给视觉模型识别后用文字返回：
 
-1. 安装 `qwen-vision` skill（或将仓库中的 `qwen-vision` 目录放入 DSH 技能目录）
-2. 在其 `.env` 中配置 `DASHSCOPE_API_KEY`（阿里云百炼 API 密钥）
-3. 可选：`VISION_MODEL` 默认 `qwen3-vl-flash`，可按需修改
+1. 克隆仓库：`git clone https://github.com/asuojun/claude-vision-skill.git`
+2. 按仓库 README 配置：将 `vision.js` 放入 DSH 技能目录，填写 API Key 与模型名
+3. 默认推荐阿里云百炼千问模型（新用户有免费额度）；也支持 OpenAI 等任何 OpenAI 兼容格式的服务，改 `BASE_URL` 即可
 
 **备选方案**：使用其他支持视觉的 skill，或选择支持图片输入的多模态模型。
 
@@ -108,7 +108,7 @@ F:\dsh-screenshots\报告-150601.docx
 
 **Q：插件自带识图能力吗？**
 
-不带。插件只负责文件落地与路径附带，不调用任何视觉模型。识别图片内容需要自行配置视觉 skill（推荐 `qwen-vision`，配置阿里云百炼 DashScope API 密钥）或使用支持视觉的模型，详见上文「识图能力（可选，需自行配置）」。没有识图能力时，文本类文件照常处理，图片会得到明确提示而非静默失败。
+不带。插件只负责文件落地与路径附带，不调用任何视觉模型。识别图片内容需要自行配置视觉 skill（推荐 `claude-vision-skill`，见上文「识图能力（可选，需自行配置）」）或使用支持视觉的模型。没有识图能力时，文本类文件照常处理，图片会得到明确提示而非静默失败。
 
 **Q：DSH 升级会影响插件吗？**
 
