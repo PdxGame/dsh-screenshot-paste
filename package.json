@@ -27,6 +27,7 @@
     "tests",
     "cordis.patch.yml",
     "README.md",
+    "CONTRIBUTING.md",
     "LICENSE"
   ]
 }
