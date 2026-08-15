@@ -1,20 +1,29 @@
-# dsh-screenshot-paste
+# 📎 dsh-screenshot-paste
 
-为 DeepSeek Harness (DSH) Web GUI 提供截图与文件粘贴板功能：支持粘贴、拖拽与浏览上传，文件以引用芯片的形式置于输入框上方，发送消息时自动附带文件路径。
+为 DeepSeek Harness (DSH) Web GUI 提供截图与文件粘贴板功能：**粘贴、拖拽或浏览上传文件**，以引用芯片的形式置于输入框上方，发送消息时**自动附带文件路径**。
+
+![version](https://img.shields.io/badge/version-0.1.0-blue)
+![license](https://img.shields.io/badge/license-MIT-green)
+![platform](https://img.shields.io/badge/platform-DSH%20Web-lightgrey)
+![size](https://img.shields.io/badge/dependencies-0-orange)
 
 > 纯外部插件：不修改 DSH 源码，仅使用官方扩展点（UI 插槽、API 路由、`agent/pre-step` 事件）。
 
-## 功能特性
+---
 
-- **多方式上传**：Ctrl+V 粘贴、拖拽、点击浏览（支持多文件）
-- **文件类型丰富**：图片 / PDF / Office 文档 / 压缩包 / 音视频 / 文本；白名单之外的类型（如 `.exe`）会被明确拒绝
-- **引用芯片**：上传的文件以芯片形式显示在输入框上方，支持预览与移除
-- **自动附带路径**：发送消息时自动将文件路径追加至消息内容，发送后自动清空
-- **零输入框污染**：不向输入框、光标或草稿插入任何内容
-- **零常驻开销**：不注册工具、不贡献提示词；无引用时对模型请求无任何影响
-- **安全**：所有 API 仅限本机回环访问；文件名经过校验，防止路径穿越；保存目录自动创建
+## ✨ 功能特性
 
-## 安装
+| | 特性 | 说明 |
+|---|---|---|
+| 📋 | **多方式上传** | Ctrl+V 粘贴、拖拽、点击浏览（支持多文件） |
+| 🗂️ | **文件类型丰富** | 图片 / PDF / Office 文档 / 压缩包 / 音视频 / 文本；白名单之外的类型（如 `.exe`）明确拒绝 |
+| 🏷️ | **引用芯片** | 上传的文件以芯片形式显示在输入框上方，支持预览与移除 |
+| 📤 | **自动附带路径** | 发送消息时自动将文件路径追加至消息内容，发送后自动清空 |
+| 🧹 | **零输入框污染** | 不向输入框、光标或草稿插入任何内容 |
+| 💰 | **零常驻开销** | 不注册工具、不贡献提示词；无引用时对模型请求无任何影响 |
+| 🔒 | **安全** | 所有 API 仅限本机回环访问；文件名经过校验，防止路径穿越；保存目录自动创建 |
+
+## 📦 安装
 
 ### 环境要求
 
@@ -33,7 +42,8 @@ dsh plugin --profile web add github:PdxGame/dsh-screenshot-paste
 dsh plugin --profile web add github:PdxGame/dsh-screenshot-paste@v0.1.0
 ```
 
-安装完成后，重启 `dsh web` 并强制刷新浏览器（Ctrl+F5），客户端资源才会重新加载。
+> [!IMPORTANT]
+> 安装完成后，**重启 `dsh web` 并强制刷新浏览器（Ctrl+F5）**，客户端资源才会重新加载。
 
 ### 卸载
 
@@ -43,9 +53,9 @@ dsh plugin --profile web remove dsh-screenshot-paste
 
 卸载后重启 `dsh web` 生效。
 
-## 配置
+## ⚙️ 配置
 
-插件开箱即用，无需任何配置。保存目录按以下优先级解析：
+插件**开箱即用，零配置**。保存目录按以下优先级解析：
 
 | 优先级 | 配置来源 | 说明 |
 |---|---|---|
@@ -69,7 +79,7 @@ set DSH_SCREENSHOT_DIR=D:\dsh-screenshots
 
 设置项留空时，按优先级 2、3 依次解析。
 
-## 使用
+## 🎯 使用
 
 1. 打开任意会话，在输入框工具区找到 📎 按钮
 2. 点击 📎 打开粘贴板面板，粘贴、拖拽或浏览上传文件
@@ -84,11 +94,11 @@ F:\dsh-screenshots\报告-150601.docx
 
 5. 智能体按文件类型处理：文本与 Office 文档可直接读取；图片的识别依赖视觉能力（见下文）
 
-## 识图能力（可选，需自行配置）
+## 👁️ 识图能力（可选，需自行配置）
 
 本插件**不包含**任何视觉模型或识图能力，仅负责文件落地与路径附带。若需要智能体识别图片内容（描述图片、提取图中文字等），必须另行配置。
 
-**推荐：安装 `claude-vision-skill`**（[asuojun/claude-vision-skill](https://github.com/asuojun/claude-vision-skill)）——让无视觉能力的模型获得识图能力，把图片交给视觉模型识别后用文字返回：
+**推荐：安装 [`claude-vision-skill`](https://github.com/asuojun/claude-vision-skill)** ——让无视觉能力的模型获得识图能力，把图片交给视觉模型识别后用文字返回：
 
 1. 克隆仓库：`git clone https://github.com/asuojun/claude-vision-skill.git`
 2. 按仓库 README 配置：将 `vision.js` 放入 DSH 技能目录，填写 API Key 与模型名
@@ -98,9 +108,10 @@ F:\dsh-screenshots\报告-150601.docx
 
 两种方式由你的运行环境提供，与本插件完全解耦，配置与否不影响插件本身的功能。
 
-**未配置视觉能力时的行为**：文本、Office 文档等文件照常处理；图片仍会以路径形式附带，但模型无法查看其内容，通常会明确说明这一点——不会静默失败。
+> [!NOTE]
+> 未配置视觉能力时：文本、Office 文档等文件照常处理；图片仍会以路径形式附带，但模型无法查看其内容，通常会明确说明这一点——**不会静默失败**。
 
-## 常见问题
+## ❓ 常见问题
 
 **Q：不附带引用时，会影响 token 消耗或缓存吗？**
 
@@ -108,7 +119,7 @@ F:\dsh-screenshots\报告-150601.docx
 
 **Q：插件自带识图能力吗？**
 
-不带。插件只负责文件落地与路径附带，不调用任何视觉模型。识别图片内容需要自行配置视觉 skill（推荐 `claude-vision-skill`，见上文「识图能力（可选，需自行配置）」）或使用支持视觉的模型。没有识图能力时，文本类文件照常处理，图片会得到明确提示而非静默失败。
+不带。插件只负责文件落地与路径附带，不调用任何视觉模型。识别图片内容需要自行配置视觉 skill（推荐 `claude-vision-skill`，见上文「👁️ 识图能力」）或使用支持视觉的模型。没有识图能力时，文本类文件照常处理，图片会得到明确提示而非静默失败。
 
 **Q：DSH 升级会影响插件吗？**
 
@@ -118,7 +129,7 @@ F:\dsh-screenshots\报告-150601.docx
 
 DSH 的客户端资源版本号在服务器启动时生成。任何插件变更（宿主端或客户端）都需要重启 `dsh web` 并硬刷新浏览器才能生效。
 
-## 开发
+## 🧪 开发
 
 仓库自带离线冒烟测试，运行于临时目录，不触碰真实数据：
 
@@ -126,7 +137,7 @@ DSH 的客户端资源版本号在服务器启动时生成。任何插件变更�
 node tests/test-host.mjs
 ```
 
-## 项目结构
+## 📁 项目结构
 
 ```
 dsh-screenshot-paste/
@@ -138,6 +149,6 @@ dsh-screenshot-paste/
 └── package.json          # 包声明（dsh.bundle / dsh.client）
 ```
 
-## 许可证
+## 📄 许可证
 
 [MIT](./LICENSE)
