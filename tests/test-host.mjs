@@ -55,10 +55,10 @@ const base = "http://127.0.0.1:18080/api/screenshot-paste"
 // 1x1 red PNG
 const PNG = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
 
-async function req(method, path, body) {
+async function req(method, path, body, extraHeaders) {
   const res = await fetch(base + path, {
     method,
-    headers: body ? { "content-type": "application/json" } : undefined,
+    headers: body ? { "content-type": "application/json", ...(extraHeaders?.headers ?? {}) } : extraHeaders?.headers,
     body: body ? JSON.stringify(body) : undefined,
   })
   const text = await res.text()
@@ -90,10 +90,23 @@ try {
   console.log("file:", r.status, r.type, "bytes:", r.text.length)
   if (r.status !== 200 || !r.type.startsWith("image/")) throw new Error("file serve failed")
 
-  // 4. bad name (traversal attempt)
-  r = await req("GET", "/file?name=..%5C..%5CWindows%5Cwin.ini")
-  console.log("traversal guard:", r.status, r.text.slice(0, 80))
-  if (r.status !== 400) throw new Error("traversal guard failed")
+  // 4. bad names (traversal & shape attempts, all must be 400)
+  const badNames = [
+    "..%5C..%5CWindows%5Cwin.ini",   // backslash traversal
+    "..%2F..%2FWindows%2Fwin.ini",   // forward-slash traversal
+    "..%2F..%2Fetc%2Fpasswd",        // unix traversal
+    "...png",                        // leading dot
+    ".hidden.png",                   // leading dot (dotfiles)
+    "a%2Fb.png",                     // embedded separator
+    "a%5Cb.png",                     // embedded backslash
+    "%20%20.png",                    // leading spaces
+    "x%3Ay.png",                     // colon
+  ]
+  for (const bad of badNames) {
+    r = await req("GET", `/file?name=${bad}`)
+    if (r.status !== 400) throw new Error(`bad name not rejected: ${bad} -> ${r.status}`)
+  }
+  console.log(`traversal/shape guard: ok (${badNames.length} cases)`)
 
   // 5. delete one
   r = await req("DELETE", `/delete?name=${encodeURIComponent(saved.name)}`)
@@ -187,6 +200,23 @@ try {
   console.log("unsupported type:", r.status, r.text)
   if (r.status !== 400) throw new Error("unsupported type must be rejected")
   console.log("文件上传(原名保留/类型校验): ok")
+
+  // 11. cross-site request fence: remote Origin must be rejected on every
+  //     state-changing route; loopback/missing Origin passes.
+  const evil = { headers: { "content-type": "application/json", origin: "https://evil.example" } }
+  r = await req("POST", "/save", { data: PNG, mime: "image/png" }, evil)
+  if (r.status !== 403) throw new Error(`cross-site save not rejected: ${r.status}`)
+  r = await req("POST", "/pending", { session: "sess-x", paths: [] }, evil)
+  if (r.status !== 403) throw new Error(`cross-site pending not rejected: ${r.status}`)
+  r = await req("DELETE", "/clear", undefined, evil)
+  if (r.status !== 403) throw new Error(`cross-site clear not rejected: ${r.status}`)
+  // GET routes stay readable cross-site (no state change; CORS still blocks reads)
+  r = await req("GET", "/list", undefined, evil)
+  if (r.status !== 200) throw new Error(`loopback GET wrongly blocked: ${r.status}`)
+  // loopback Origin passes
+  r = await req("POST", "/pending", { session: "sess-x", paths: [] }, { headers: { "content-type": "application/json", origin: "http://127.0.0.1:3080" } })
+  if (r.status !== 200) throw new Error(`loopback origin wrongly blocked: ${r.status}`)
+  console.log("跨站请求防护(Origin 校验): ok")
 
   console.log("\n✅ 宿主半区全流程测试通过")
 } finally {

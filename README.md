@@ -32,18 +32,31 @@
 
 ### 安装插件
 
-```sh
-dsh plugin --profile web add github:PdxGame/dsh-screenshot-paste
-```
-
-如需固定版本，可指定版本标签：
+固定版本（推荐，可复现）：
 
 ```sh
 dsh plugin --profile web add github:PdxGame/dsh-screenshot-paste@v0.1.0
 ```
 
+如需跟踪最新 `main`，去掉 `@v0.1.0` 后缀。
+
+> [!TIP]
+> 若 `dsh` 不在 PATH（例如通过 `pnpm dsh` 启动的环境），在 DSH 安装目录下改用：
+> ```sh
+> pnpm dsh plugin --profile web add github:PdxGame/dsh-screenshot-paste@v0.1.0
+> ```
+
 > [!IMPORTANT]
 > 安装完成后，**重启 `dsh web` 并强制刷新浏览器（Ctrl+F5）**，客户端资源才会重新加载。
+
+### 安装后验证
+
+重启后打开 `http://127.0.0.1:3080`，任意会话输入框工具区应出现 📎 按钮。也可命令行验证宿主 API：
+
+```sh
+curl http://127.0.0.1:3080/api/screenshot-paste/list
+# 应返回 {"dir":"F:\\dsh-screenshots","files":[...]}
+```
 
 ### 卸载
 
@@ -93,6 +106,9 @@ F:\dsh-screenshots\报告-150601.docx
 ```
 
 5. 智能体按文件类型处理：文本与 Office 文档可直接读取；图片的识别依赖视觉能力（见下文）
+
+> [!NOTE]
+> 模型拿到的是文件路径（如 `F:\dsh-screenshots\报告-150601.docx`），需要智能体的文件访问能力能读到该路径。受限沙箱会话可能无法访问保存目录之外的文件——如需使用，请将保存目录配置在会话工作区可达的位置（见「⚙️ 配置」）。
 
 ## 👁️ 识图能力（可选，需自行配置）
 
