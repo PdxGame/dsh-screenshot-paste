@@ -22,10 +22,10 @@
 
 ```sh
 # 方式一：直接装 GitHub 仓库（需仓库已发布）
-dsh plugin --profile web add github:<你的用户名>/dsh-screenshot-paste
+dsh plugin --profile web add github:PdxGame/dsh-screenshot-paste
 
 # 方式二：克隆后本地链接（开发/调试推荐）
-git clone https://github.com/<你的用户名>/dsh-screenshot-paste.git
+git clone https://github.com/PdxGame/dsh-screenshot-paste.git
 dsh plugin --profile web add link:<克隆到的路径>
 ```
 
@@ -44,12 +44,12 @@ dsh plugin --profile web remove dsh-screenshot-paste
 git init
 git add .
 git commit -m "dsh-screenshot-paste 0.1.0"
-git remote add origin https://github.com/<你的用户名>/dsh-screenshot-paste.git
+git remote add origin https://github.com/PdxGame/dsh-screenshot-paste.git
 git push -u origin main
 git tag v0.1.0 && git push origin v0.1.0   # 可选：固定版本，README 中可写 github:<用户名>/dsh-screenshot-paste@v0.1.0
 ```
 
-其他电脑安装：`dsh plugin --profile web add github:<你的用户名>/dsh-screenshot-paste`（或带 `@v0.1.0` 固定版本）→ 重启 `dsh web` → Ctrl+F5。
+其他电脑安装：`dsh plugin --profile web add github:PdxGame/dsh-screenshot-paste`（或带 `@v0.1.0` 固定版本）→ 重启 `dsh web` → Ctrl+F5。
 
 ## ⚙️ 配置
 
