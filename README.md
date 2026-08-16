@@ -2,7 +2,7 @@
 
 为 DeepSeek Harness (DSH) Web GUI 提供截图与文件粘贴板功能：**粘贴、拖拽或浏览上传文件**，以引用芯片的形式置于输入框上方，发送消息时**自动附带文件路径**。
 
-![version](https://img.shields.io/badge/version-0.1.0-blue)
+![version](https://img.shields.io/badge/version-0.1.1-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![platform](https://img.shields.io/badge/platform-DSH%20Web-lightgrey)
 ![size](https://img.shields.io/badge/dependencies-0-orange)
@@ -19,6 +19,9 @@
 | 🗂️ | **文件类型丰富** | 图片 / PDF / Office 文档 / 压缩包 / 音视频 / 文本；白名单之外的类型（如 `.exe`）明确拒绝 |
 | 🏷️ | **引用芯片** | 上传的文件以芯片形式显示在输入框上方，支持预览与移除 |
 | 📤 | **自动附带路径** | 发送消息时自动将文件路径追加至消息内容，发送后自动清空 |
+| 📁 | **原生目录选择** | 面板「更改」按钮弹出系统原生文件夹选择框（官方 `directoryPicker` 服务，PowerShell 兜底），随时更换保存目录 |
+| 🔄 | **自动迁移** | 更换保存目录时自动把旧目录文件搬到新目录（同名加后缀不覆盖），已引用路径同步更新，引用状态不丢失 |
+| 🧹 | **引用自动清理** | 源文件被删除后，对应引用芯片自动消失，不会附带失效路径 |
 | 🧹 | **零输入框污染** | 不向输入框、光标或草稿插入任何内容 |
 | 💰 | **零常驻开销** | 不注册工具、不贡献提示词；无引用时对模型请求无任何影响 |
 | 🔒 | **安全** | 所有 API 仅限本机回环访问；文件名经过校验，防止路径穿越；保存目录自动创建 |
@@ -35,15 +38,15 @@
 固定版本（推荐，可复现）：
 
 ```sh
-dsh plugin --profile web add github:PdxGame/dsh-screenshot-paste@v0.1.0
+dsh plugin --profile web add github:PdxGame/dsh-screenshot-paste@v0.1.1
 ```
 
-如需跟踪最新 `main`，去掉 `@v0.1.0` 后缀。
+如需跟踪最新 `main`，去掉 `@v0.1.1` 后缀。
 
 > [!TIP]
 > 若 `dsh` 不在 PATH（例如通过 `pnpm dsh` 启动的环境），在 DSH 安装目录下改用：
 > ```sh
-> pnpm dsh plugin --profile web add github:PdxGame/dsh-screenshot-paste@v0.1.0
+> pnpm dsh plugin --profile web add github:PdxGame/dsh-screenshot-paste@v0.1.1
 > ```
 
 > [!IMPORTANT]
@@ -55,7 +58,7 @@ dsh plugin --profile web add github:PdxGame/dsh-screenshot-paste@v0.1.0
 
 ```sh
 curl http://127.0.0.1:3080/api/screenshot-paste/list
-# 应返回 {"dir":"F:\\dsh-screenshots","files":[...]}
+# 应返回 {"dir":"<插件目录>/screenshots","files":[...]}
 ```
 
 ### 卸载
@@ -74,7 +77,7 @@ dsh plugin --profile web remove dsh-screenshot-paste
 |---|---|---|
 | 1 | 设置项 `dsh-screenshot-paste.dir` | 在 DSH 设置页或 `~/.dsh/settings.yaml` 中配置，改动即时生效，无需重启 |
 | 2 | 环境变量 `DSH_SCREENSHOT_DIR` | 显式指定保存目录 |
-| 3 | 默认值 | `F:\dsh-screenshots`；该路径不可用时自动回退至 `~/.dsh/screenshots` |
+| 3 | 默认值 | 插件目录下的 `screenshots/`（临时中转文件，已被 `.gitignore` 排除）；该路径不可用时自动回退至 `~/.dsh/screenshots` |
 
 设置项（优先级 1）与其他 DSH 插件（如 dsh-ssh）使用同一配置机制。示例：
 
@@ -101,14 +104,26 @@ set DSH_SCREENSHOT_DIR=D:\dsh-screenshots
 
 ```
 [附件引用]
-F:\dsh-screenshots\shot-142314.png
-F:\dsh-screenshots\报告-150601.docx
+<插件目录>\screenshots\shot-142314.png
+<插件目录>\screenshots\报告-150601.docx
 ```
 
 5. 智能体按文件类型处理：文本与 Office 文档可直接读取；图片的识别依赖视觉能力（见下文）
 
+### 更换保存目录
+
+面板底部「保存目录」旁点击**「更改」**，弹出系统原生文件夹选择框，选好后：
+
+- 保存目录立即切换，面板显示新路径
+- **旧目录中的文件自动迁移**到新目录（同名文件自动加 `-1`/`-2` 后缀，绝不覆盖）
+- 已添加的引用路径同步更新，引用状态保持不变
+- 面板提示「已迁移 N 个文件到新目录」
+
 > [!NOTE]
-> 模型拿到的是文件路径（如 `F:\dsh-screenshots\报告-150601.docx`），需要智能体的文件访问能力能读到该路径。受限沙箱会话可能无法访问保存目录之外的文件——如需使用，请将保存目录配置在会话工作区可达的位置（见「⚙️ 配置」）。
+> 保存目录的默认位置是插件目录下的 `screenshots/`（已加入 `.gitignore`，不会上传到 GitHub；首次使用时自动创建）。它是临时中转目录，**重装或更新插件时会被清空**——长期保留的文件请换到其他位置。
+
+> [!NOTE]
+> 模型拿到的是文件路径（如 `<插件目录>\screenshots\报告-150601.docx`），需要智能体的文件访问能力能读到该路径。受限沙箱会话可能无法访问保存目录之外的文件——如需使用，请将保存目录配置在会话工作区可达的位置（见「⚙️ 配置」）。
 
 ## 👁️ 识图能力（可选，需自行配置）
 
@@ -140,6 +155,14 @@ F:\dsh-screenshots\报告-150601.docx
 **Q：DSH 升级会影响插件吗？**
 
 插件安装于 profile（用户数据区），独立于 DSH 安装目录，升级不会丢失。插件仅依赖官方扩展点；若 DSH 大版本变更相关接口，需要按新接口适配。
+
+**Q：更换保存目录后，旧文件会丢吗？**
+
+不会。切换目录时插件自动把旧目录中的文件迁移到新目录（同名文件加后缀，绝不覆盖），已添加的引用路径也会同步更新。若个别文件迁移失败（如被占用），会留在原目录，不影响新目录使用。
+
+**Q：删除了已引用的文件，引用会怎样？**
+
+引用会自动消失。面板刷新时会校验引用对应的文件是否还存在，不存在的引用会被自动清理，因此不会把失效路径附带进消息。
 
 **Q：为什么修改后需要重启服务器？**
 

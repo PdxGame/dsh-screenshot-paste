@@ -1,6 +1,6 @@
 {
   "name": "dsh-screenshot-paste",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Screenshot/file paste board for the DSH Web GUI: paste, drag or browse to save files locally, show reference chips above the input, and auto-append file paths when sending a message.",
   "private": true,
   "type": "module",
